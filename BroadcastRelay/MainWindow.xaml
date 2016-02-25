@@ -1,0 +1,73 @@
+﻿<Window x:Class="OutbreakLabs.BroadcastRelay.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Broadcast Relay" Height="350" Width="850" Loaded="Window_Loaded" Closed="Window_Closed" StateChanged="Window_StateChanged" Closing="Window_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <TabControl x:Name="tclTabs" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <TabItem Header="Listening Adapters">
+                <ListBox ItemsSource="{Binding ListenAdapters}" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding Text}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </TabItem>
+            <TabItem Header="Destinations">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <ListView ItemsSource="{Binding DestinationEntries}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Destination IP">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding IPAddress}" VerticalAlignment="Top" Width="120"  IsEnabled="{Binding IsInvalid}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Locked">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsEnabled="False" IsChecked="{Binding IsValid, Mode=OneWay}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Lock">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Lock" HorizontalAlignment="Right" Click="btnLock_Click" IsEnabled="{Binding IsInvalid, Mode=OneWay}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Delete">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="X" HorizontalAlignment="Right" Click="btnDeleteDestination"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <Button x:Name="btnAddDestination" Content="Add" HorizontalAlignment="Right" Click="btnAddDestination_Click" Grid.Row="1"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <StatusBar Grid.Row="1" VerticalAlignment="Top">
+
+            <TextBlock>Packets Relayed:</TextBlock>
+            <Label x:Name="lblPacketsRelayed" Content="0"/>
+        </StatusBar>
+
+    </Grid>
+</Window>
