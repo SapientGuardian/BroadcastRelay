@@ -9,6 +9,7 @@ namespace OutbreakLabs.BroadcastRelay
     using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Linq;
     using System.Net;
     using System.Timers;
@@ -16,6 +17,7 @@ namespace OutbreakLabs.BroadcastRelay
     using System.Windows.Controls;
     using System.Windows.Interop;
     using System.Windows.Media.Imaging;
+    using System.Windows.Navigation;
 
     using Hardcodet.Wpf.TaskbarNotification;
 
@@ -34,9 +36,9 @@ namespace OutbreakLabs.BroadcastRelay
 
         private readonly RelayManager relayManager;
 
-        private TaskbarIcon taskbarIcon;
+        private readonly bool forceExit;
 
-        private bool forceExit = false;
+        private TaskbarIcon taskbarIcon;
 
         public MainWindow()
         {
@@ -63,13 +65,35 @@ namespace OutbreakLabs.BroadcastRelay
             this.packetsRelayedTimer.Start();
         }
 
+        /// <summary>
+        ///     Gets or sets the adapters on which to listen.
+        /// </summary>
+        /// <value>
+        ///     The adapters.
+        /// </value>
+        public ObservableCollection<AdapterSelection> ListenAdapters { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the destinations to relay packets.
+        /// </summary>
+        /// <value>
+        ///     The destinations.
+        /// </value>
+        public ObservableCollection<DestinationEntry> DestinationEntries { get; set; }
+
+        public string Version => $"Broadcast Relay {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
+
+        /// <summary>
+        ///     Determines whether the system has WinPcap installed.
+        /// </summary>
+        /// <returns>True if installed, false if not</returns>
         private bool HasWinPcap()
         {
             try
             {
                 CaptureDeviceList.Instance.ToString();
             }
-            catch (DllNotFoundException dnfe)
+            catch (DllNotFoundException)
             {
                 return false;
             }
@@ -78,36 +102,20 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Gets or sets the adapters on which to listen.
-        /// </summary>
-        /// <value>
-        /// The adapters.
-        /// </value>
-        public ObservableCollection<AdapterSelection> ListenAdapters { get; set; }
-
-        /// <summary>
-        /// Gets or sets the destinations to relay packets.
-        /// </summary>
-        /// <value>
-        /// The destinations.
-        /// </value>
-        public ObservableCollection<DestinationEntry> DestinationEntries { get; set; }
-
-        /// <summary>
-        /// Handles the Elapsed event of the packetsRelayedTimer. Used to update the Packets Relayed counter
+        ///     Handles the Elapsed event of the packetsRelayedTimer. Used to update the Packets Relayed counter
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="ElapsedEventArgs" /> instance containing the event data.</param>
         private void packetsRelayedTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             this.Dispatcher.Invoke(() => { this.lblPacketsRelayed.Content = this.relayManager.PacketsRelayed; });
         }
 
         /// <summary>
-        /// Handles the Loaded event of the Window.
+        ///     Handles the Loaded event of the Window.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -137,7 +145,7 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Configures the systray icon.
+        ///     Configures the systray icon.
         /// </summary>
         private void SetupTray()
         {
@@ -148,10 +156,10 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Handles the TrayMouseDoubleClick event of the systray icon.
+        ///     Handles the TrayMouseDoubleClick event of the systray icon.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void tbi_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
         {
             this.Show();
@@ -160,7 +168,7 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Loads destinations from storage and adds them to the relay manager.
+        ///     Loads destinations from storage and adds them to the relay manager.
         /// </summary>
         private void LoadDestinations()
         {
@@ -177,7 +185,7 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Loads the adapter selections from storage, ultimately adding them to the relay manager.
+        ///     Loads the adapter selections from storage, ultimately adding them to the relay manager.
         /// </summary>
         private void LoadAdapters()
         {
@@ -202,10 +210,10 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Handles the PropertyChanged event of the adapter selection entries, namely IsSelected.
+        ///     Handles the PropertyChanged event of the adapter selection entries, namely IsSelected.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="PropertyChangedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="PropertyChangedEventArgs" /> instance containing the event data.</param>
         private void adapterSelection_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var typed = sender as AdapterSelection;
@@ -230,20 +238,20 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Handles the Click event of the Add Destination button.
+        ///     Handles the Click event of the Add Destination button.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void btnAddDestination_Click(object sender, RoutedEventArgs e)
         {
             this.DestinationEntries.Add(new DestinationEntry());
         }
 
         /// <summary>
-        /// Handles the Click event of the X button on the destination entries.
+        ///     Handles the Click event of the X button on the destination entries.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void btnDeleteDestination(object sender, RoutedEventArgs e)
         {
             var DestinationEntry = ((Button)sender).DataContext as DestinationEntry;
@@ -259,18 +267,19 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Handles the Closed event of the Window.
+        ///     Handles the Closed event of the Window.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         private void Window_Closed(object sender, EventArgs e)
         {
             try
             {
                 this.relayManager?.Dispose();
                 this.packetsRelayedTimer?.Stop();
-                this.persistenceProvider?.SaveAdapterSelections(this.ListenAdapters.Where(a => a.IsSelected).Select(a=>a.Text));
-                this.persistenceProvider?.SaveDestinations(this.DestinationEntries.Select(a=>a.IPAddress));
+                this.persistenceProvider?.SaveAdapterSelections(
+                    this.ListenAdapters.Where(a => a.IsSelected).Select(a => a.Text));
+                this.persistenceProvider?.SaveDestinations(this.DestinationEntries.Select(a => a.IPAddress));
                 this.taskbarIcon?.Dispose();
             }
             catch (Exception ex)
@@ -280,10 +289,10 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Handles the StateChanged event of the Window.
+        ///     Handles the StateChanged event of the Window.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         private void Window_StateChanged(object sender, EventArgs e)
         {
             if (this.WindowState == WindowState.Minimized)
@@ -293,10 +302,10 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Handles the Closing event of the Window.
+        ///     Handles the Closing event of the Window.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="CancelEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="CancelEventArgs" /> instance containing the event data.</param>
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             if (!this.forceExit)
@@ -310,10 +319,10 @@ namespace OutbreakLabs.BroadcastRelay
         }
 
         /// <summary>
-        /// Handles the Click event of the Lock button on the destination entries.
+        ///     Handles the Click event of the Lock button on the destination entries.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs" /> instance containing the event data.</param>
         private void btnLock_Click(object sender, RoutedEventArgs e)
         {
             var destinationEntry = ((Button)sender).DataContext as DestinationEntry;
@@ -326,6 +335,17 @@ namespace OutbreakLabs.BroadcastRelay
             {
                 MessageBox.Show("IP address is not valid");
             }
+        }
+
+        /// <summary>
+        ///     Handles the RequestNavigate event of Hyperlinks.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RequestNavigateEventArgs" /> instance containing the event data.</param>
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
     }
 }

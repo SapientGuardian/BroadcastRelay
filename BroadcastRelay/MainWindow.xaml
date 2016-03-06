@@ -61,6 +61,23 @@
                     <Button x:Name="btnAddDestination" Content="Add" HorizontalAlignment="Right" Click="btnAddDestination_Click" Grid.Row="1"/>
                 </Grid>
             </TabItem>
+            <TabItem Header="About">
+                <StackPanel>
+                    <TextBlock Text="{Binding Version}" />
+                    <TextBlock>Written by Noah Potash</TextBlock>
+                    <TextBlock>
+                        <Hyperlink NavigateUri="https://github.com/SapientGuardian/BroadcastRelay" RequestNavigate="Hyperlink_RequestNavigate">
+                        https://github.com/SapientGuardian/BroadcastRelay
+                        </Hyperlink>
+                    </TextBlock>
+                    <TextBlock>
+                        <Hyperlink NavigateUri="http://www.outbreaklabs.com" RequestNavigate="Hyperlink_RequestNavigate">
+                        http://www.outbreaklabs.com
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+
+            </TabItem>
         </TabControl>
 
         <StatusBar Grid.Row="1" VerticalAlignment="Top">
