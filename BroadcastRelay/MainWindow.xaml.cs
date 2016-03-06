@@ -36,6 +36,8 @@ namespace OutbreakLabs.BroadcastRelay
 
         private TaskbarIcon taskbarIcon;
 
+        private bool forceExit = false;
+
         public MainWindow()
         {
             this.InitializeComponent();
@@ -43,6 +45,13 @@ namespace OutbreakLabs.BroadcastRelay
                 Properties.Resources.MainIco.Handle,
                 Int32Rect.Empty,
                 BitmapSizeOptions.FromEmptyOptions());
+
+            if (!this.HasWinPcap())
+            {
+                MessageBox.Show("You must install WinPcap before using this application");
+                this.forceExit = true;
+                this.Close();
+            }
 
             this.ListenAdapters = new ObservableCollection<AdapterSelection>();
             this.DestinationEntries = new ObservableCollection<DestinationEntry>();
@@ -52,6 +61,20 @@ namespace OutbreakLabs.BroadcastRelay
             this.packetsRelayedTimer = new Timer(1000);
             this.packetsRelayedTimer.Elapsed += this.packetsRelayedTimer_Elapsed;
             this.packetsRelayedTimer.Start();
+        }
+
+        private bool HasWinPcap()
+        {
+            try
+            {
+                CaptureDeviceList.Instance.ToString();
+            }
+            catch (DllNotFoundException dnfe)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -244,11 +267,11 @@ namespace OutbreakLabs.BroadcastRelay
         {
             try
             {
-                this.relayManager.Dispose();
-                this.packetsRelayedTimer.Stop();
-                this.persistenceProvider.SaveAdapterSelections(this.ListenAdapters.Where(a => a.IsSelected).Select(a=>a.Text));
-                this.persistenceProvider.SaveDestinations(this.DestinationEntries.Select(a=>a.IPAddress));
-                this.taskbarIcon.Dispose();
+                this.relayManager?.Dispose();
+                this.packetsRelayedTimer?.Stop();
+                this.persistenceProvider?.SaveAdapterSelections(this.ListenAdapters.Where(a => a.IsSelected).Select(a=>a.Text));
+                this.persistenceProvider?.SaveDestinations(this.DestinationEntries.Select(a=>a.IPAddress));
+                this.taskbarIcon?.Dispose();
             }
             catch (Exception ex)
             {
@@ -276,11 +299,14 @@ namespace OutbreakLabs.BroadcastRelay
         /// <param name="e">The <see cref="CancelEventArgs"/> instance containing the event data.</param>
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            var messageBoxResult = MessageBox.Show(
-                "Are you sure you want to exit?",
-                "Exit Confirmation",
-                MessageBoxButton.YesNo);
-            e.Cancel = messageBoxResult == MessageBoxResult.No;
+            if (!this.forceExit)
+            {
+                var messageBoxResult = MessageBox.Show(
+                    "Are you sure you want to exit?",
+                    "Exit Confirmation",
+                    MessageBoxButton.YesNo);
+                e.Cancel = messageBoxResult == MessageBoxResult.No;
+            }
         }
 
         /// <summary>
