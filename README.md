@@ -13,7 +13,7 @@ similar to a firewall, inspecting network traffic and pulling out packets which 
 These packets are then modified to route to the configured addresses and retransmitted.
 
 ## Where to get it
-Download [Broadcast Relay 1.0.0.0](https://github.com/SapientGuardian/LibPacketGremlin/releases/download/1.0.0.0/BroadcastRelay_1.0.0.0.zip)
+Download [Broadcast Relay 1.0.0.0](https://github.com/SapientGuardian/BroadcastRelay/releases/download/1.0.0.0/BroadcastRelay_1.0.0.0.zip)
 
 ## Requirements
 You must install [.NET Framework 4.6.1](https://www.microsoft.com/en-us/download/details.aspx?id=49981), as well as [Win10Pcap](http://www.win10pcap.org/download/) or [WinPcap](http://www.winpcap.org/install/default.htm) in order to use BroadcastRelay.
