@@ -25,7 +25,7 @@ an adapter on which to listen and defined at least one destination to relay, sub
 1. Ensure you have met the [requirements](https://github.com/SapientGuardian/BroadcastRelay#requirements)
 1. Select at least one adapter on the Listening Adapters tab. This selection chooses the adapters where broadcast packets should be captured.
 If you only have one adapter, it will be selected automatically. There probably isn't any harm in selecting all of your adapters, but you have the ability
-to be selective. If you aren't sure, what to select, you should probably select all of them.
+to be selective. If you aren't sure what to select, you can select all of them.
 1. Move to the Destinations tab. Here, you can define destinations where broadcast packets will be sent. If using VPN software like Hamachi, you would the
 IP address of one or more of your peers here. If you're on a network with multiple subnets, this would be the IP address of the computer you're attempting to
 communicate with. Add a peer by clicking the "Add" button in the lower right corner of the window. Enter the IP address in the empty text box of the newly
